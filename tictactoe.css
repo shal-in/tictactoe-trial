@@ -29,9 +29,10 @@ body{
 }
 
 #header {
+    width: 300px;
     height: 55px;
     font-size: 54px;
-    text-transform: lowercase;
+    text-align: center;
 }
 
 #subheader{

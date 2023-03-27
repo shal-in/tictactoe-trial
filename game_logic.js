@@ -21,13 +21,14 @@ function boxClicked(e) {
         e.target.innerText=gridText;
         turnCount ++;
 
+        winnerText = document.getElementById('header');
         if (checkIfWinner() !== false) {
-            console.log(`${gridText} wins!`);
+            winnerText.textContent = `${gridText} wins!`;
         }
         
         else {
             if (turnCount >= 9){
-                console.log(`Draw!`);
+            winnerText.textContent = `draw!`
             }
         }
 
@@ -71,4 +72,5 @@ function restart() {
     grids.forEach(grid => grid.addEventListener('click',boxClicked));
     currentPlayer = 1;
     turnCount = 0;
-}
+    winnerText.textContent = "tic tac toe";
+};
