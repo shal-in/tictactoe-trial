@@ -5,15 +5,15 @@
 }
 
 :root {
-    --background:#4C3B4D;
-    --textTitle: #A6C2B4;
-    --textGame: #82968C;
-    --winningSquares: #392C3A;
+    --background:#13505B;
+    --primary-color: #A0D2DB;
+    --secondary-color: #FFFFFA ;
+    --winningSquares: #0E3B43;
     --mainFont: 'Times New Roman'
 }
 
 body{
-    color:var(--textTitle);
+    color:var(--primary-color);
     font-family: var(--mainFont);
     background-color: var(--background);
 }
@@ -27,7 +27,7 @@ body{
     padding-top: 6px;
 }
 
-.theme-btn{
+#theme-btn{
     margin-right: 2px;
     background-color: var(--background);
     border: 1px solid black;
@@ -38,11 +38,11 @@ body{
     font-size: 20px;
     font-weight: bold;
     text-decoration: underline;
-    color: var(--text);
+    color: var(--primary-color);
 }
 
-.theme-btn:hover{
-    color: var(--textGame);
+#theme-btn:hover{
+    color: var(--secondary-color);
 }
 
 .header-box{
@@ -67,7 +67,7 @@ body{
     margin-left: 37px;
 }
 
-.restart-btn{
+#restart-btn{
     background-color: var(--background);
     border: none;
     margin-left: auto;
@@ -78,11 +78,11 @@ body{
     font-size: 20px;
     font-weight: bold;
     text-decoration: underline;
-    color: var(--textTitle);
+    color: var(--primary-color);
 }
 
-.restart-btn:hover{
-    color: var(--textGame);
+#restart-btn:hover{
+    color: var(--secondary-color);
 }
 
 .container {
@@ -108,10 +108,10 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--textGame);
+    color: var(--primar-color);
     font-size: 80px;
     background-color: var(--background);
-    border: 1.5px solid var(--textTitle);
+    border: 1.5px solid var(--primary-color);
 }
 
 .grid:nth-child(1),.grid:nth-child(2),.grid:nth-child(3) {

@@ -1,20 +1,27 @@
 let grids = Array.from(document.getElementsByClassName('grid'));
+let restartBtn = document.getElementById('restart-btn')
+let themeBtn = document.getElementById('theme-btn')
 let spaces = Array(9).fill(null);
 let currentPlayer = 1;
 let turnCount = 0;
 let themesIndex = 0;
+let winningSquares = null;
 
-//[theme name,background, textTitle, textGame, winningSquares, mainFont] 
-const themes =[
-    ['purple','#4C3B4D','#A6C2B4','#82968C','#392C3A','Times New Roman'],
-    ['green','#CAD593','#2A3C24','#7A895C','#75704E'],
-    ['indigo','#08415C','#CC2936','#6A3549','#15407A']
-]
+root = document.documentElement;
 
-let winningColor = themes[themesIndex][4]
+const rootStyles = getComputedStyle(root);
+const background = rootStyles.getPropertyValue('--background');
+const primaryColor = rootStyles.getPropertyValue('--primary-color');
+const secondaryColor = rootStyles.getPropertyValue('--secondary-color');
+let winningColor = rootStyles.getPropertyValue('--winningSquares');
+const mainFont = rootStyles.getPropertyValue('--mainFont');
+let themes = [['main',background, primaryColor, secondaryColor, winningColor, mainFont],
+    ['dark', '#16171B', ' #8B5FBF', ' #BFA7DC ', ' #090A0B', ' "Times New Roman" '],
+    ['light', '#DEFFFC', ' #218380', ' #3B413C ', ' #85FFF5', ' "Times New Roman" ']
+    ]
 
-const root = document.documentElement;
-
+restartBtn.addEventListener('click',restart);
+themeBtn.addEventListener('click',toggleTheme);
 grids.forEach(grid => grid.addEventListener('click',boxClicked));
 
 function boxClicked(e) {
@@ -30,13 +37,13 @@ function boxClicked(e) {
         e.target.innerText=gridText;
         turnCount ++;
 
+        winningColor = themes[themesIndex][4]
         winnerText = document.getElementById('header');
         if (checkIfWinner() !== false) {
             winnerText.textContent = `${gridText} wins!`;
             winningSquares = checkIfWinner();
             for (let i=0; i<winningSquares.length; i++) {
                 grids[winningSquares[i]].style.backgroundColor = winningColor
-                console.log(themesIndex);
             }
         }
         
@@ -87,10 +94,8 @@ function restart() {
     currentPlayer = 1;
     turnCount = 0;
     winnerText.textContent = "tic tac toe";
-    winningSquares;
+    winningSquares = null;
 };
-
-
 
 function toggleTheme() {
     themesIndex++;
@@ -98,18 +103,18 @@ function toggleTheme() {
         themesIndex = 0;
     }
     theme = themes[themesIndex];
-    winningColor = theme[4]
     root.style.setProperty('--background',theme[1]);
-    root.style.setProperty('--textTitle',theme[2]);
-    root.style.setProperty('--textGame',theme[3]);
+    root.style.setProperty('--primary-color',theme[2]);
+    root.style.setProperty('--secondary-color',theme[3]);
     root.style.setProperty('--winningSquares',theme[4]);
     if (theme.length == 6) {
         root.style.setProperty('--mainFont',theme[5])
     }
+    winningColor = themes[themesIndex][4]
     if (winningSquares !== null) {
         for (let i=0; i<winningSquares.length; i++) {
             grids[winningSquares[i]].style.backgroundColor = winningColor;
         }
     }
-
 }
+
