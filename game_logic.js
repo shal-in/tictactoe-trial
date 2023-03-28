@@ -24,6 +24,10 @@ function boxClicked(e) {
         winnerText = document.getElementById('header');
         if (checkIfWinner() !== false) {
             winnerText.textContent = `${gridText} wins!`;
+            winningSquares = checkIfWinner();
+            for (let i=0; i<winningSquares.length; i++) {
+                grids[winningSquares[i]].style.backgroundColor = 'red';
+            }
         }
         
         else {
