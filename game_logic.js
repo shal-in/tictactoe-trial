@@ -2,9 +2,18 @@ let grids = Array.from(document.getElementsByClassName('grid'));
 let spaces = Array(9).fill(null);
 let currentPlayer = 1;
 let turnCount = 0;
+let themesIndex = 0;
+
+//[theme name,background, textTitle, textGame, winningSquares, mainFont] 
+const themes =[
+    ['purple','#4C3B4D','#A6C2B4','#82968C','#392C3A','Times New Roman'],
+    ['green','#CAD593','#2A3C24','#7A895C','#75704E'],
+    ['indigo','#08415C','#CC2936','#6A3549','#15407A']
+]
+
+let winningColor = themes[themesIndex][4]
 
 const root = document.documentElement;
-const winningColor = getComputedStyle(root).getPropertyValue('--winningSquares');
 
 grids.forEach(grid => grid.addEventListener('click',boxClicked));
 
@@ -26,7 +35,8 @@ function boxClicked(e) {
             winnerText.textContent = `${gridText} wins!`;
             winningSquares = checkIfWinner();
             for (let i=0; i<winningSquares.length; i++) {
-                grids[winningSquares[i]].style.backgroundColor = winningColor;
+                grids[winningSquares[i]].style.backgroundColor = winningColor
+                console.log(themesIndex);
             }
         }
         
@@ -77,15 +87,10 @@ function restart() {
     currentPlayer = 1;
     turnCount = 0;
     winnerText.textContent = "tic tac toe";
+    winningSquares;
 };
 
-//[theme name,background, textTitle, textGame, winningSquares, mainFont] 
-const themes =[
-    ['purple','#4C3B4D','#A6C2B4','#82968C','#392C3A','Times New Roman'],
-    ['green','#CAD593','#2A3C24','#7A895C','#C0D181'],
-    ['indigo','#08415C','#CC2936','#6A3549','#15405A']
-]
-let themesIndex = 0
+
 
 function toggleTheme() {
     themesIndex++;
@@ -93,6 +98,7 @@ function toggleTheme() {
         themesIndex = 0;
     }
     theme = themes[themesIndex];
+    winningColor = theme[4]
     root.style.setProperty('--background',theme[1]);
     root.style.setProperty('--textTitle',theme[2]);
     root.style.setProperty('--textGame',theme[3]);
@@ -100,6 +106,10 @@ function toggleTheme() {
     if (theme.length == 6) {
         root.style.setProperty('--mainFont',theme[5])
     }
-}
+    if (winningSquares !== null) {
+        for (let i=0; i<winningSquares.length; i++) {
+            grids[winningSquares[i]].style.backgroundColor = winningColor;
+        }
+    }
 
-// root.style.setProperty('--background',theme[0])
+}
