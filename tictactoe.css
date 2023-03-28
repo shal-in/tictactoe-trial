@@ -6,14 +6,43 @@
 
 :root {
     --background:#4C3B4D;
-    --grid: #82968C;
-    --text: #A6C2B4;
+    --textTitle: #A6C2B4;
+    --textGame: #82968C;
     --winningSquares: #392C3A;
+    --mainFont: 'Times New Roman'
 }
 
 body{
-    color:var(--text);
-    font-family: 'Times New Roman';
+    color:var(--textTitle);
+    font-family: var(--mainFont);
+    background-color: var(--background);
+}
+
+.theme-container{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: end;
+    padding:3px;
+    padding-top: 6px;
+}
+
+.theme-btn{
+    margin-right: 2px;
+    background-color: var(--background);
+    border: 1px solid black;
+    border: none;
+    width: 60px;
+    height: 22px;
+    font-family: var(--mainFont);
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: underline;
+    color: var(--text);
+}
+
+.theme-btn:hover{
+    color: var(--textGame);
 }
 
 .header-box{
@@ -45,20 +74,20 @@ body{
     margin-right: 24px;
     width: 80px;
     height: 22px;
-    font-family: 'Times New Roman';
+    font-family: var(--mainFont);
     font-size: 20px;
     font-weight: bold;
     text-decoration: underline;
-    color: var(--text);
+    color: var(--textTitle);
 }
 
 .restart-btn:hover{
-    color: var(--grid);
+    color: var(--textGame);
 }
 
 .container {
-    padding: 40px;
-    height: 100vh;
+    padding: 0;
+    height: 85vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -79,10 +108,10 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text);
+    color: var(--textGame);
     font-size: 80px;
     background-color: var(--background);
-    border: 1.5px solid var(--grid);
+    border: 1.5px solid var(--textTitle);
 }
 
 .grid:nth-child(1),.grid:nth-child(2),.grid:nth-child(3) {

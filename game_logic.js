@@ -3,7 +3,7 @@ let spaces = Array(9).fill(null);
 let currentPlayer = 1;
 let turnCount = 0;
 
-const root = document.querySelector(':root');
+const root = document.documentElement;
 const winningColor = getComputedStyle(root).getPropertyValue('--winningSquares');
 
 grids.forEach(grid => grid.addEventListener('click',boxClicked));
@@ -78,3 +78,28 @@ function restart() {
     turnCount = 0;
     winnerText.textContent = "tic tac toe";
 };
+
+//[theme name,background, textTitle, textGame, winningSquares, mainFont] 
+const themes =[
+    ['purple','#4C3B4D','#A6C2B4','#82968C','#392C3A','Times New Roman'],
+    ['green','#CAD593','#2A3C24','#7A895C','#C0D181'],
+    ['indigo','#08415C','#CC2936','#6A3549','#15405A']
+]
+let themesIndex = 0
+
+function toggleTheme() {
+    themesIndex++;
+    if (themesIndex >= themes.length){
+        themesIndex = 0;
+    }
+    theme = themes[themesIndex];
+    root.style.setProperty('--background',theme[1]);
+    root.style.setProperty('--textTitle',theme[2]);
+    root.style.setProperty('--textGame',theme[3]);
+    root.style.setProperty('--winningSquares',theme[4]);
+    if (theme.length == 6) {
+        root.style.setProperty('--mainFont',theme[5])
+    }
+}
+
+// root.style.setProperty('--background',theme[0])
