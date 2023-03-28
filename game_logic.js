@@ -1,10 +1,10 @@
-let playerText = document.getElementById('playerText')
 let grids = Array.from(document.getElementsByClassName('grid'));
 let spaces = Array(9).fill(null);
-let player1_col = getComputedStyle(document.body).getPropertyValue('--player1');
-let player2_col = getComputedStyle(document.body).getPropertyValue('--player2');
 let currentPlayer = 1;
 let turnCount = 0;
+
+const root = document.querySelector(':root');
+const winningColor = getComputedStyle(root).getPropertyValue('--winningSquares');
 
 grids.forEach(grid => grid.addEventListener('click',boxClicked));
 
@@ -26,7 +26,7 @@ function boxClicked(e) {
             winnerText.textContent = `${gridText} wins!`;
             winningSquares = checkIfWinner();
             for (let i=0; i<winningSquares.length; i++) {
-                grids[winningSquares[i]].style.backgroundColor = 'red';
+                grids[winningSquares[i]].style.backgroundColor = winningColor;
             }
         }
         
