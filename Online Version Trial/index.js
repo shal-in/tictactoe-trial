@@ -1,7 +1,11 @@
 const http = require("http");
+const app = require("express")();
+app.get("/", (req,res) => res.sendFile(__dirname + "/index.html"));
+
+app.listen(9091, () => console.log("Listening on http port 9091!"));
 const websocketServer = require("websocket").server;
 const httpServer = http.createServer();
-httpServer.listen(9090, () => console.log("Hello, 9090!"));
+httpServer.listen(9090, () => console.log("Listening on 9090!"));
 // hashmap
 const clients = {};
 
@@ -20,14 +24,14 @@ wsServer.on("request", request => {
     })
 
     // generate a new clientID
-    const clientID = guid();
-    clients[clientID] = {
+    const clientId = guid();
+    clients[clientId] = {
         "connection": connection
     }
 
     const payLoad = {
         "method": "connect",
-        "clientID": clientID
+        "clientId": clientId
     }
     // send back the client connect
     connection.send(JSON.stringify(payLoad));
