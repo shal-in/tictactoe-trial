@@ -62,9 +62,11 @@ body{
 }
 
 #start-btn-container{
+    margin-top: 17px;
     border: 2px solid var(--borderTest);
+    border-top: 5px solid black;
     width: 650px;
-    height: 120px;
+    height: 200px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -72,7 +74,7 @@ body{
 }
 
 #local-btn{
-    background-color: var(--background);
+    background-color: transparent;
     border: 1px solid var(--borderTest);
     margin-left: 150px;
     margin-right: auto;
@@ -90,7 +92,7 @@ body{
 }
 
 #online-btn{
-    background-color: var(--background);
+    background-color: transparent;
     border: 1px solid var(--borderTest);
     margin-left: auto;
     margin-right: 145px;
@@ -115,10 +117,16 @@ body{
     font-family: var(--mainFont);
     font-weight: bold;
     text-decoration: underline dashed;
-    height: 60px;
+    height: 66.5px;
     width: 345px;
     margin-right: 10px;
     margin-left: auto;
+    margin-top: 6.5px;
+}
+
+#join-input:focus{
+    color: var(--secondary-color);
+    text-decoration-color: var(--primary-color);
 }
 
 #join-input:not(:focus)::placeholder{
@@ -134,7 +142,7 @@ body{
 }
 
 #join-btn{
-    background-color: var(--background);
+    background-color: transparent;
     border: 1px solid var(--borderTest);
     /* border: none; */
     margin-right: auto;
@@ -150,5 +158,39 @@ body{
 }
 
 #join-btn:hover{
+    color: var(--secondary-color)
+}
+
+#example-text {
+    background-color: transparent;
+    border: 1px solid var(--borderTest);
+    margin-left: 126px;
+    margin-right: auto;
+    width: 213px;
+    height: 25px;
+    font-family: var(--mainFont);
+    font-size: 25px;
+    font-weight: bold;
+    color: var(--primary-color);
+    padding-bottom: 40px;
+}
+
+#back-btn{
+    background-color: transparent;
+    border: 1px solid var(--borderTest);
+    /* border: none; */
+    margin-right: auto;
+    margin-left: 10px;
+    width: 105px;
+    height: 60px;
+    padding: none;
+    font-family: var(--mainFont);
+    font-size: 60px;
+    font-weight: bold;
+    text-decoration: underline;
+    color: var(--primary-color);
+}
+
+#back-btn:hover{
     color: var(--secondary-color)
 }
