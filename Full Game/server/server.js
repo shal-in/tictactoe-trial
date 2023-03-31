@@ -35,7 +35,8 @@ const wsServer = new websocketServer({
     'httpServer' : httpServer
 });
 
-
+let player1ID;
+let player2ID;
 wsServer.on('request', request => {
     // connect
     const connection = request.accept(null, request.origin);
@@ -47,20 +48,46 @@ wsServer.on('request', request => {
         
         // creating a new game
         if (result.method === "create") {
-            const clientID = result.clientID;
+            player1ID = result.clientID;
             const gameID = createGameID();
             games[gameID] = {
                 "gameID": gameID,
-                "clients": []
-            }
+                "clients": [
+                    {'clientID': player1ID,
+                    'character': 'X'}
+                ]}
 
             const payLoad = {
                 "method": "create",
                 "game": games[gameID]
             }
 
-            const con = clients[clientID].connection;
+            const con = clients[player1ID].connection;
             con.send(JSON.stringify(payLoad));
+        }
+
+        if (result.method === "join") {
+            player2ID = result.clientID;
+            const gameID = result.gameID;
+            const game = games[gameID];
+
+            if (game.clients.length === 2) {
+                // max players reached
+                return;
+            }
+
+            game.clients.push({
+                'clientID': player2ID,
+                'character': "O"
+            })
+
+            const payLoad = {
+                'method': 'join',
+                'game': game
+            }
+
+            // tell first client that a player has joined
+            clients[player1ID].connection.send(JSON.stringify(payLoad));
         }
 
 

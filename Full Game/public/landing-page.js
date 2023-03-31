@@ -11,6 +11,37 @@ const mainContainer = document.getElementById('main-container');
 const gameBoard = document.createElement('div');
 const ws = new WebSocket('ws://localhost:3030');
 
+ws.onmessage = message => {
+    const response = JSON.parse(message.data);
+
+    // connect to server
+    if (clientID === null) {
+        if (response.method === 'connect') {
+            clientID = response.clientID;
+            console.log(`your clientID: ${clientID}`)
+        }
+    }
+
+    // create game
+    if (response.method === "create") {
+        gameID = response.game.gameID; 
+        console.log("gameID: " + response.game.gameID)
+    }
+
+    // join game
+    if (response.method === 'join') {
+        const game = response.game;
+
+        game.clients.forEach(c => {
+            if (c.clientID !== clientID) {
+                console.log(c.clientID + ' joined')                
+            }
+
+        })
+        
+    }
+}
+
 // localBtn function
 function localBtnAction() {
     console.log('local');
@@ -72,27 +103,19 @@ function joinBtnAction() {
     console.log('join');
     if (gameID === '') {
         gameID = joinInput.value;
-        console.log("enter: " + gameID);
     }   
+
+    const payLoad = {
+        "method": "join",
+        "clientID": clientID,
+        "gameID": gameID
+    }
+    
+    ws.send(JSON.stringify(payLoad));
+    console.log(`joining game: ${gameID}`)
 }
 
-ws.onmessage = message => {
-    const response = JSON.parse(message.data);
 
-    // connect to server
-    if (clientID === null) {
-        if (response.method === 'connect') {
-            clientID = response.clientID;
-            console.log(`client ${clientID} joined!`)
-        }
-    }
-
-    // create game
-    if (response.method === "create") {
-        gameID = response.game.gameID; 
-        console.log("gameID: " + response.game.gameID)
-    }
-}
 
 
 // onlineBtn function
@@ -198,12 +221,8 @@ function restartBtnAction(){
 localBtn.addEventListener('click', e => localBtnAction());
 onlineBtn.addEventListener('click', e => onlineBtnAction());
 joinBtn.addEventListener('click', e => joinBtnAction());
-joinInput.addEventListener('keyup', (e) => {
-    if (gameID === '') {
-        if (e.keyCode === 13){
-            gameID = joinInput.value;
-            console.log("enter: " + gameID);
-        }
-    }   
+joinInput.addEventListener('keyup', e => {
+    if (e.keyCode === 13) {
+        joinBtnAction();
+    }
 });
-
