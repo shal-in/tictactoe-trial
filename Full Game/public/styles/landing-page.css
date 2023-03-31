@@ -38,7 +38,6 @@ body{
     height: 212px;
     display: flex;
     flex-wrap: wrap;
-    padding: px;
     align-items: center;
     justify-content: center;
 }
@@ -57,8 +56,10 @@ body{
     padding-top: 0px;
     font-size: 70px;
     height: 70px;
+    width: 457px;
     border: 1px solid var(--borderTest);
     color: black;
+    margin: auto;
 }
 
 #start-btn-container{
@@ -175,22 +176,83 @@ body{
     padding-bottom: 40px;
 }
 
-#back-btn{
+#home-btn{
     background-color: transparent;
     border: 1px solid var(--borderTest);
     /* border: none; */
     margin-right: auto;
-    margin-left: 10px;
-    width: 105px;
-    height: 60px;
+    margin-left: auto;
+    width: 98px;
+    height: 40px;
     padding: none;
     font-family: var(--mainFont);
-    font-size: 60px;
+    font-size: 40px;
     font-weight: bold;
     text-decoration: underline;
     color: var(--primary-color);
 }
 
-#back-btn:hover{
+#home-btn:hover{
     color: var(--secondary-color)
+}
+
+#restart-btn{
+    background-color: transparent;
+    border: 1px solid var(--borderTest);
+    /* border: none; */
+    margin-right: auto;
+    margin-left: auto;
+    width: 118px;
+    height: 40px;
+    padding: none;
+    font-family: var(--mainFont);
+    font-size: 40px;
+    font-weight: bold;
+    text-decoration: underline;
+    color: var(--primary-color);
+}
+
+#restart-btn:hover{
+    color: var(--secondary-color)
+}
+
+#gameboard{
+    margin-top: 30px;
+    width: 400px;
+    height: 347px;
+    border: 2px solid var(--borderTest);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: center;
+
+
+}
+
+.grid{
+    height: 115px;
+    width: 115px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    font-size: 80px;
+    background-color: transparent;
+    border: 1.5px solid var(--primary-color);
+}
+
+.grid:nth-child(1),.grid:nth-child(2),.grid:nth-child(3) {
+    border-top: none;
+}
+
+.grid:nth-child(1),.grid:nth-child(4),.grid:nth-child(7) {
+    border-left: none;
+}
+
+.grid:nth-child(3),.grid:nth-child(6),.grid:nth-child(9) {
+    border-right: none;
+}
+
+.grid:nth-child(7),.grid:nth-child(8),.grid:nth-child(9) {
+    border-bottom: none;
 }
