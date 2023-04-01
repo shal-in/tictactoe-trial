@@ -66,9 +66,23 @@ wsServer.on('request', request => {
             con.send(JSON.stringify(payLoad));
         }
 
-        if (result.method === "join") {
+        if (result.method === 'join') {
             player2ID = result.clientID;
             const gameID = result.gameID;
+
+            if (!games[gameID]) {
+                // invalid code
+
+                const payLoad = {
+                    'method': 'join',
+                    'game': undefined
+                }
+
+                clients[player2ID].connection.send(JSON.stringify(payLoad));
+
+                return;
+            }
+
             const game = games[gameID];
 
             if (game.clients.length === 2) {

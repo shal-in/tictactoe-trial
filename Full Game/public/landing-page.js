@@ -31,6 +31,11 @@ ws.onmessage = message => {
     // join game
     if (response.method === 'join') {
         const game = response.game;
+        if (!game) {
+            console.log('invalid code');
+            gameID = '';
+            return;
+        }
 
         game.clients.forEach(c => {
             if (c.clientID !== clientID) {
