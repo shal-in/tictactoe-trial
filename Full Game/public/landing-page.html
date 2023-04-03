@@ -5,9 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/styles/landing-page.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>tic tac toe by shalin</title>
 </head>
 <body>
+    <script>
+        if (window.location.pathname !== '/') {
+          window.location.replace('/');
+        }
+    </script>
+        
     <div id="main-container">
         <div id="header-container">
             <h1 id="header-text">tic tac toe</h1>
@@ -21,7 +28,6 @@
             <div id="example-text">e.g. "now-red-say"</div>
         </div>  
     </div>    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/landing-page.js"></script>
 
 </body>

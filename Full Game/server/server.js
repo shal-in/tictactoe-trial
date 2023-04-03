@@ -23,6 +23,12 @@ app.use(express.static('public'));
 
 app.listen(3031, () => console.log('Listening on port 3031!'));
 
+app.post("/",(req,res) => {
+    console.log("Server-side function called");
+    updateGameState();
+    res.send("Response from server");
+})
+
 const http = require('http');
 const websocketServer = require('websocket').server;
 const httpServer = http.createServer();
@@ -54,8 +60,8 @@ wsServer.on('request', request => {
                 "gameID": gameID,
                 "clients": [
                     {'clientID': player1ID,
-                    'character': 'X'}
-                ]}
+                    'character': 'X'}],
+                'spaces': Array(9).fill(null)}
 
             const payLoad = {
                 "method": "create",
@@ -66,8 +72,9 @@ wsServer.on('request', request => {
             con.send(JSON.stringify(payLoad));
         }
 
+        //joining a game
         if (result.method === 'join') {
-            player2ID = result.clientID;
+            player2ID = result.clientID;            
             const gameID = result.gameID;
 
             if (!games[gameID]) {
@@ -95,14 +102,31 @@ wsServer.on('request', request => {
                 'character': "O"
             })
 
+            if (game.clients.length === 2){
+                updateGameState();
+            }
+
             const payLoad = {
                 'method': 'join',
                 'game': game
             }
 
-            // tell first client that a player has joined
+            // tell both client that a player has joined
             clients[player1ID].connection.send(JSON.stringify(payLoad));
+            clients[player2ID].connection.send(JSON.stringify(payLoad));
         }
+
+        // playing the game
+        if (result.method === 'play') {
+            const gameID = result.gameID;
+            // let spaces = games[gameID].spaces;
+            let move = result.move;
+            if (!move) {
+                move = {}
+            }
+            console.log(move)
+        }
+
 
 
     })
@@ -203,4 +227,20 @@ function createGameID() {
 
     return gameId;
 }
-  
+
+// function for updating game state
+function updateGameState() {
+    for (const g of Object.keys(games)) {
+        const game = games[g];
+        const payLoad = {
+            'method': 'update',
+            'game': game
+        }
+
+        game.clients.forEach(c => {
+            clients[c.clientID].connection.send(JSON.stringify(payLoad));
+        })
+        console.log('update state')
+        // setTimeout(updateGameState, 2000);
+    }   
+}

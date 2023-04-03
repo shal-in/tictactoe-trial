@@ -1,5 +1,9 @@
 let clientID = null;
 let gameID = '';
+let grids = [];
+let spaces;
+let playerID;
+let response;
 
 const headerContainer = document.getElementById('header-container');
 const localBtn = document.getElementById('local-btn');
@@ -24,8 +28,10 @@ ws.onmessage = message => {
 
     // create game
     if (response.method === "create") {
-        gameID = response.game.gameID; 
+        gameID = response.game.gameID;
+        spaces = response.game.spaces;
         console.log("gameID: " + response.game.gameID)
+        copyToClipboard(gameID);
     }
 
     // join game
@@ -37,14 +43,24 @@ ws.onmessage = message => {
             return;
         }
 
+        spaces = game.spaces;
         game.clients.forEach(c => {
             if (c.clientID !== clientID) {
-                console.log(c.clientID + ' joined')                
-            }
-
+                console.log(c.clientID + ' joined')              
+            }    
         })
-        
     }
+
+    // updating the game
+    if (response.method === 'update'){
+        if (!response.game.spaces) {
+            console.log('no spaces')
+            return
+        }
+
+        console.log('update')
+    }
+
 }
 
 // localBtn function
@@ -118,6 +134,61 @@ function joinBtnAction() {
     
     ws.send(JSON.stringify(payLoad));
     console.log(`joining game: ${gameID}`)
+
+    const homeBtn = document.createElement('button');
+    const restartBtn = document.createElement('button');
+
+    // remove buttons container
+    startBtnContainer.remove();
+
+    // add home & restart button
+    homeBtn.addEventListener('click', e => homeBtnAction());
+    homeBtn.setAttribute('id', 'home-btn');
+    homeBtn.textContent = 'home';
+
+    restartBtn.addEventListener('click', restartBtnAction);
+    restartBtn.setAttribute('id', 'restart-btn');
+    restartBtn.textContent = 'restart';
+
+    // restyle header container
+    headerContainer.style.height = '145px';
+    headerContainer.style.width = '';
+
+    const headerText = headerContainer.querySelector('#header-text');
+    headerText.style.fontSize =  '100px';
+    headerText.style.height =  '100px';
+    headerText.style.width =  '';
+
+    const subHeaderText = headerContainer.querySelector('#subheader-text');
+    subHeaderText.style.fontSize =  '40px';
+    subHeaderText.textContent = 'by shalin'
+    subHeaderText.style.height =  '40px';
+    subHeaderText.style.width =  '160px';
+    subHeaderText.style.marginLeft =  '2px';
+    subHeaderText.style.marginRight =  'auto';
+
+
+    headerContainer.insertBefore(restartBtn,subHeaderText);
+    headerContainer.insertBefore(homeBtn,subHeaderText);
+
+    // add grid
+    gameBoardId = gameBoard.id;
+    if (!gameBoardId){
+        gameBoard.setAttribute('id','gameboard');
+        for (let i = 0; i < 9; i++) {
+            const gridSquare = document.createElement('div');
+            gridSquare.classList.add('grid');
+
+            gridSquare.setAttribute('id', i.toString());
+            gridSquare.addEventListener('click', boxClicked)
+            grids.push(gridSquare);
+            gameBoard.appendChild(gridSquare);
+        }
+    }
+
+    mainContainer.appendChild(gameBoard);
+
+
 }
 
 
@@ -179,12 +250,47 @@ function onlineBtnAction() {
             gridSquare.classList.add('grid');
 
             gridSquare.setAttribute('id', i.toString());
-            gameBoard.appendChild(gridSquare); 
+            gridSquare.addEventListener('click', boxClicked)
+            grids.push(gridSquare);
+            gameBoard.appendChild(gridSquare);
         }
     }
 
     mainContainer.appendChild(gameBoard);
 }
+// clicking grids function
+function boxClicked(e) {
+    const id = e.target.id;
+    console.log(e.target.id)
+    if (!spaces[id]) {
+        spaces[id] = "X"
+    }
+    let move = [id, "X"]
+    
+    const payLoad = {
+        'method': 'play',
+        'clientID': clientID,
+        'gameID': gameID,
+        'move': move
+    }
+    ws.send(JSON.stringify(payLoad));
+    (console.log("test: " + move[0] + move[1]))
+
+    $.ajax({
+        type:"post",
+        ucl: "/",
+        data: {
+            //include any data to be sent to server
+        },
+        success: function(response) {
+            console.log(response);
+        },
+        error: function() {
+            console.error("Error making AJAX request");
+        }
+    })
+}
+
 
 // homeBtn function
 function homeBtnAction(){
@@ -231,3 +337,10 @@ joinInput.addEventListener('keyup', e => {
         joinBtnAction();
     }
 });
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text)
+      .catch((error) => {
+        console.error("Error copying to clipboard:", error);
+      });
+}

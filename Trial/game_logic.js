@@ -1,4 +1,4 @@
-let grids = Array.from(document.getElementsByClassName('grid'));
+let grids = Array.from(document.getElementsByClassName('grid'))
 let restartBtn = document.getElementById('restart-btn')
 let themeBtn = document.getElementById('theme-btn')
 let spaces = Array(9).fill(null);
