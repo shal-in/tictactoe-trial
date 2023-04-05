@@ -6,6 +6,7 @@ const dirName = __dirname;
 const parentDirName = path.dirname(dirName);
 
 app.get('/', (req, res) => res.sendFile(parentDirName + '/public/landing-page.html'));
+app.get('/local', (req, res) => res.sendFile(parentDirName + '/public/local.html'));
 
 // Set MIME type for CSS files
 app.get('/styles/landing-page.css', (req, res) => {
@@ -46,6 +47,7 @@ const wsServer = new websocketServer({
 });
 
 wsServer.on('request', request => {
+    
     // connect
     const connection = request.accept(null, request.origin);
     connection.on('open', () => console.log('opened!'));
@@ -72,6 +74,7 @@ wsServer.on('request', request => {
 
             const con = clients[player1ID].connection;
             con.send(JSON.stringify(payLoad));
+
         }
 
         //joining a game

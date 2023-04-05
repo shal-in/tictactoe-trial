@@ -1,3 +1,5 @@
+localStorage.setItem('testVar', 'some value');
+
 let clientID = null;
 let gameID = '';
 let grids = [];
@@ -32,6 +34,7 @@ ws.onmessage = message => {
         gameID = response.game.gameID;
         spaces = response.game.spaces;
         console.log("gameID: " + response.game.gameID)
+        window.location.href = "/online/" + gameID
         copyToClipboard(gameID);
     }
 
@@ -77,18 +80,6 @@ ws.onmessage = message => {
         
         let turnCount = spaces.filter(grid => grid !== null).length;
 
-        if (checkIfWinner() !== false) {
-            let winningSquares = checkIfWinner();
-            console.log(winningSquares)
-        }
-
-        else {
-            if (turnCount >= 9) {
-                console.log('draw') 
-            }
-
-        }
-
         for (const id of Object.keys(spaces)) {
             if (!spaces[id]) {
                 continue
@@ -100,6 +91,19 @@ ws.onmessage = message => {
                 grid = document.getElementById(id);
                 grid.innerHTML = spaces[id]
                 grid.removeEventListener('click', boxClicked)
+            }
+        }
+
+        if (checkIfWinner() !== false) {
+            let winningSquares = checkIfWinner();
+            console.log(winningSquares)
+            return;
+        }
+
+        else {
+            if (turnCount >= 9) {
+                console.log('draw') 
+                return
             }
         }
 
@@ -126,58 +130,7 @@ ws.onmessage = message => {
 
 // localBtn function
 function localBtnAction() {
-    console.log('local');
-    const homeBtn = document.createElement('button');
-    const restartBtn = document.createElement('button');
-
-    // remove buttons container
-    startBtnContainer.remove();
-
-    // add home & restart button
-    homeBtn.addEventListener('click', homeBtnAction);
-    homeBtn.setAttribute('id', 'home-btn');
-    homeBtn.textContent = 'home';
-
-    restartBtn.addEventListener('click', restartBtnAction);
-    restartBtn.setAttribute('id', 'restart-btn');
-    restartBtn.textContent = 'restart';
-
-    // restyle header container
-    headerContainer.style.height = '145px';
-    headerContainer.style.width = '';
-
-    const headerText = headerContainer.querySelector('#header-text');
-    headerText.style.fontSize =  '100px';
-    headerText.style.height =  '100px';
-    headerText.style.width =  '';
-
-    const subHeaderText = headerContainer.querySelector('#subheader-text');
-    subHeaderText.style.fontSize =  '40px';
-    subHeaderText.textContent = 'by shalin'
-    subHeaderText.style.height =  '40px';
-    subHeaderText.style.width =  '160px';
-    subHeaderText.style.marginLeft =  '2px';
-    subHeaderText.style.marginRight =  'auto';
-
-
-    headerContainer.insertBefore(restartBtn,subHeaderText);
-    headerContainer.insertBefore(homeBtn,subHeaderText);
-    
-    // add grid
-    gameBoardId = gameBoard.id;
-    if (!gameBoardId){
-        gameBoard.setAttribute('id','gameboard');
-        for (let i = 0; i < 9; i++) {
-            const gridSquare = document.createElement('div');
-            gridSquare.classList.add('grid');
-
-            gridSquare.setAttribute('id', i.toString());
-            gameBoard.appendChild(gridSquare); 
-        }
-    }
-
-    mainContainer.appendChild(gameBoard);
-    
+    window.location.href = "/local"
 }
 
 // joinBtn function
@@ -258,6 +211,7 @@ function joinBtnAction() {
 // onlineBtn function
 function onlineBtnAction() {
     console.log('online');
+    window.location.href = "/online"
     playerID = 'X';
     turnCount = 1;
 
