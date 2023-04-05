@@ -4,6 +4,7 @@ let grids = [];
 let spaces;
 let playerID;
 let response;
+let turnCount;
 
 const headerContainer = document.getElementById('header-container');
 const localBtn = document.getElementById('local-btn');
@@ -42,12 +43,26 @@ ws.onmessage = message => {
             gameID = '';
             return;
         }
-
-        spaces = game.spaces;
+        
         game.clients.forEach(c => {
             if (c.clientID !== clientID) {
                 console.log(c.clientID + ' joined')              
             }    
+        })
+        
+        // make request to update game
+        $.ajax({
+            type:"post",
+            url: "/",
+            data: {
+                    // data to send to server
+            },
+            success: function(response) {
+                console.log(response);
+            },
+            error: function() {
+                console.error("Error making AJAX request");
+            }
         })
     }
 
@@ -58,10 +73,56 @@ ws.onmessage = message => {
             return
         }
 
-        console.log('update')
-    }
+        spaces = response.game.spaces
+        
+        let turnCount = spaces.filter(grid => grid !== null).length;
 
+        if (checkIfWinner() !== false) {
+            let winningSquares = checkIfWinner();
+            console.log(winningSquares)
+        }
+
+        else {
+            if (turnCount >= 9) {
+                console.log('draw') 
+            }
+
+        }
+
+        for (const id of Object.keys(spaces)) {
+            if (!spaces[id]) {
+                continue
+            }
+            if (spaces[id] === playerID) {
+                continue
+            }
+            else {
+                grid = document.getElementById(id);
+                grid.innerHTML = spaces[id]
+                grid.removeEventListener('click', boxClicked)
+            }
+        }
+
+        if (turnCount % 2 === 0 && playerID === 'X') {
+            // X plays
+            for (let i = 0; i < spaces.length; i++) {
+                if (spaces[i] === null) {
+                    grids[i].addEventListener('click', boxClicked)
+                }
+            }
+        }
+
+        if (turnCount % 2 === 1 && playerID === 'O') {
+            // O plays
+            for (let i = 0; i < spaces.length; i++) {
+                if (spaces[i] === null) {
+                    grids[i].addEventListener('click', boxClicked)
+                }
+            }
+        }
+    }
 }
+
 
 // localBtn function
 function localBtnAction() {
@@ -122,6 +183,8 @@ function localBtnAction() {
 // joinBtn function
 function joinBtnAction() {
     console.log('join');
+    playerID = 'O';
+    turnCount = 2;
     if (gameID === '') {
         gameID = joinInput.value;
     }   
@@ -192,11 +255,11 @@ function joinBtnAction() {
 }
 
 
-
-
 // onlineBtn function
 function onlineBtnAction() {
     console.log('online');
+    playerID = 'X';
+    turnCount = 1;
 
     const payLoad = {
         "method": "create",
@@ -258,15 +321,18 @@ function onlineBtnAction() {
 
     mainContainer.appendChild(gameBoard);
 }
+
 // clicking grids function
 function boxClicked(e) {
     const id = e.target.id;
-    console.log(e.target.id)
     if (!spaces[id]) {
-        spaces[id] = "X"
+        spaces[id] = playerID
     }
-    let move = [id, "X"]
+    let move = [id, playerID]
     
+    e.target.innerHTML = playerID;
+    grids.forEach(grid => grid.removeEventListener('click',boxClicked))
+
     const payLoad = {
         'method': 'play',
         'clientID': clientID,
@@ -274,21 +340,7 @@ function boxClicked(e) {
         'move': move
     }
     ws.send(JSON.stringify(payLoad));
-    (console.log("test: " + move[0] + move[1]))
 
-    $.ajax({
-        type:"post",
-        ucl: "/",
-        data: {
-            //include any data to be sent to server
-        },
-        success: function(response) {
-            console.log(response);
-        },
-        error: function() {
-            console.error("Error making AJAX request");
-        }
-    })
 }
 
 
@@ -338,9 +390,33 @@ joinInput.addEventListener('keyup', e => {
     }
 });
 
+
+// function to copy to clipboard;
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
       .catch((error) => {
         console.error("Error copying to clipboard:", error);
       });
+}
+// function to check for winner
+function checkIfWinner() {
+    const winningCombos = [
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+        [0,4,8],
+        [2,4,6],
+    ]
+    
+    for (let i = 0; i < winningCombos.length; i++) {
+        [a,b,c] = winningCombos[i]
+        if (spaces[a] && (spaces[a] == spaces[b] && spaces[a] == spaces[c])) {
+            grids.forEach(grid => grid.removeEventListener('click',boxClicked));
+            return [a,b,c]
+        }
+    }
+    return false
 }

@@ -24,25 +24,27 @@ app.use(express.static('public'));
 app.listen(3031, () => console.log('Listening on port 3031!'));
 
 app.post("/",(req,res) => {
-    console.log("Server-side function called");
     updateGameState();
-    res.send("Response from server");
 })
 
 const http = require('http');
 const websocketServer = require('websocket').server;
 const httpServer = http.createServer();
-httpServer.listen(3030, () => console.log('Listening on port 3030!'));
+httpServer.listen(3030, () => {
+    console.log('Server is active on port 3030!')
+    });
+
 
 const clients = {};
 const games = {};
+let player1ID;
+let player2ID;
+let gameID;
 
 const wsServer = new websocketServer({
     'httpServer' : httpServer
 });
 
-let player1ID;
-let player2ID;
 wsServer.on('request', request => {
     // connect
     const connection = request.accept(null, request.origin);
@@ -51,11 +53,11 @@ wsServer.on('request', request => {
     connection.on('message', message => {
         const result = JSON.parse(message.utf8Data);
         // message received from client
-        
+
         // creating a new game
         if (result.method === "create") {
             player1ID = result.clientID;
-            const gameID = createGameID();
+            gameID = createGameID();
             games[gameID] = {
                 "gameID": gameID,
                 "clients": [
@@ -75,23 +77,21 @@ wsServer.on('request', request => {
         //joining a game
         if (result.method === 'join') {
             player2ID = result.clientID;            
-            const gameID = result.gameID;
+            gameID = result.gameID;
 
             if (!games[gameID]) {
+                
                 // invalid code
-
                 const payLoad = {
                     'method': 'join',
                     'game': undefined
                 }
 
                 clients[player2ID].connection.send(JSON.stringify(payLoad));
-
                 return;
             }
 
             const game = games[gameID];
-
             if (game.clients.length === 2) {
                 // max players reached
                 return;
@@ -101,10 +101,6 @@ wsServer.on('request', request => {
                 'clientID': player2ID,
                 'character': "O"
             })
-
-            if (game.clients.length === 2){
-                updateGameState();
-            }
 
             const payLoad = {
                 'method': 'join',
@@ -118,13 +114,13 @@ wsServer.on('request', request => {
 
         // playing the game
         if (result.method === 'play') {
-            const gameID = result.gameID;
-            // let spaces = games[gameID].spaces;
-            let move = result.move;
-            if (!move) {
-                move = {}
-            }
-            console.log(move)
+            gameID = result.gameID;
+            let spaces = games[gameID].spaces;
+            let move = result.move; // [id, character]
+
+            spaces[move[0]] = move[1];
+            games[gameID].spaces = spaces;
+            updateGameState()
         }
 
 
@@ -146,9 +142,20 @@ wsServer.on('request', request => {
 
         // send back the client connect
     connection.send(JSON.stringify(payLoad))
-
-
 })
+
+// function for updating game state
+function updateGameState() {  
+    const game = games[gameID];
+    payLoad = {
+        'method': 'update',
+        'game':game
+    }
+    game.clients.forEach(c => {
+        clients[c.clientID].connection.send(JSON.stringify(payLoad));
+    })
+}
+
 // function to create a clientID: random 8-character string of letters and numbers
 function createClientID() {
     
@@ -228,19 +235,3 @@ function createGameID() {
     return gameId;
 }
 
-// function for updating game state
-function updateGameState() {
-    for (const g of Object.keys(games)) {
-        const game = games[g];
-        const payLoad = {
-            'method': 'update',
-            'game': game
-        }
-
-        game.clients.forEach(c => {
-            clients[c.clientID].connection.send(JSON.stringify(payLoad));
-        })
-        console.log('update state')
-        // setTimeout(updateGameState, 2000);
-    }   
-}
