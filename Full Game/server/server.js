@@ -14,33 +14,51 @@ app.get('/styles/landing-page.css', (req, res) => {
   res.sendFile(parentDirName + '/public/styles/landing-page.css');
 });
 
+app.get('/styles/local.css', (req, res) => {
+    res.set('Content-Type', 'text/css');
+    res.sendFile(parentDirName + '/public/styles/local.css');
+  });
+
+  app.get('/styles/online.css', (req, res) => {
+    res.set('Content-Type', 'text/css');
+    res.sendFile(parentDirName + '/public/styles/online.css');
+  });
+
 // Set MIME type for JS files
 app.get('/landing-page.js', (req, res) => {
   res.set('Content-Type', 'application/javascript');
   res.sendFile(parentDirName + '/public/landing-page.js');
 });
 
+app.get('/local.js', (req, res) => {
+    res.set('Content-Type', 'application/javascript');
+    res.sendFile(parentDirName + '/public/local.js');
+  });
+
+  app.get('/online.js', (req, res) => {
+    res.set('Content-Type', 'application/javascript');
+    res.sendFile(parentDirName + '/public/online.js');
+  });
+
 app.use(express.static('public'));
 
-app.listen(3031, () => console.log('Listening on port 3031!'));
+app.listen(3031, () => console.log('Client port: 3031!'));
 
 app.post("/",(req,res) => {
     updateGameState();
 })
 
 const http = require('http');
+const {client} = require('websocket');
 const websocketServer = require('websocket').server;
 const httpServer = http.createServer();
 httpServer.listen(3030, () => {
-    console.log('Server is active on port 3030!')
+    console.log('Server port: 3030!')
     });
 
 
 const clients = {};
 const games = {};
-let player1ID;
-let player2ID;
-let gameID;
 
 const wsServer = new websocketServer({
     'httpServer' : httpServer
@@ -51,100 +69,118 @@ wsServer.on('request', request => {
     // connect
     const connection = request.accept(null, request.origin);
     connection.on('open', () => console.log('opened!'));
-    connection.on('close', () => console.log('closed!'));
     connection.on('message', message => {
         const result = JSON.parse(message.utf8Data);
         // message received from client
 
+        if (result.method === 'connect') {
+            let clientID = createClientID();
+            clients[clientID] = {
+                'connection': connection
+            };
+
+            const payLoad = {
+                'method': 'connect',
+                'clientID': clientID
+            }
+
+            // send back the client connect
+            connection.send(JSON.stringify(payLoad));
+        }
+
         // creating a new game
         if (result.method === "create") {
-            player1ID = result.clientID;
-            gameID = createGameID();
-            games[gameID] = {
-                "gameID": gameID,
-                "clients": [
-                    {'clientID': player1ID,
-                    'character': 'X'}],
-                'spaces': Array(9).fill(null)}
+            clientID = result.clientID;
+            const gameID = createGameID();
+            const url = '/online/' + gameID
+            app.get((url), (req, res) => res.sendFile(parentDirName + '/public/online.html'));
+            app.get(url + '/styles/online.css', (req, res) => {
+                res.set('Content-Type', 'text/css');
+                res.sendFile(parentDirName + '/public/styles/online.css');
+            });
 
             const payLoad = {
                 "method": "create",
-                "game": games[gameID]
+                "gameID": gameID
             }
-
-            const con = clients[player1ID].connection;
-            con.send(JSON.stringify(payLoad));
-
+            
+            clients[clientID].connection.send(JSON.stringify(payLoad));
+        
+            games[gameID] = {
+                "gameID": gameID,
+                "clients": [],
+                'spaces': Array(9).fill(null)}
         }
 
-        //joining a game
+        // reconnecting to game (on online.js)
+        if (result.method === 'reconnect') {
+            clientID = createClientID();
+            gameID = result.gameID;
+            clients[clientID] = {
+                'connection': connection
+            };
+
+            games[gameID].clients.push({
+                'clientID': clientID
+            })
+
+            const payLoad = {
+                'method': 'reconnect',
+                'clientID': clientID,
+                'game': games[gameID]
+            }
+
+            connection.send(JSON.stringify(payLoad));
+            // updateGameState()
+
+            // delete originalID
+            originalClientID = result.originalClientID;
+            if (originalClientID) {
+                delete clients[originalClientID]
+            }
+        }
+
+        // joining a game
         if (result.method === 'join') {
-            player2ID = result.clientID;            
+            clientID = result.clientID;            
             gameID = result.gameID;
 
             if (!games[gameID]) {
-                
                 // invalid code
                 const payLoad = {
                     'method': 'join',
-                    'game': undefined
+                    'gameID': undefined
                 }
-
-                clients[player2ID].connection.send(JSON.stringify(payLoad));
+                clients[clientID].connection.send(JSON.stringify(payLoad));
                 return;
             }
 
             const game = games[gameID];
             if (game.clients.length === 2) {
-                // max players reached
+                 // max players reached
                 return;
             }
 
-            game.clients.push({
-                'clientID': player2ID,
-                'character': "O"
-            })
-
             const payLoad = {
                 'method': 'join',
-                'game': game
+                'gameID': gameID
             }
 
-            // tell both client that a player has joined
-            clients[player1ID].connection.send(JSON.stringify(payLoad));
-            clients[player2ID].connection.send(JSON.stringify(payLoad));
+            clients[clientID].connection.send(JSON.stringify(payLoad));
         }
 
         // playing the game
         if (result.method === 'play') {
             gameID = result.gameID;
-            let spaces = games[gameID].spaces;
             let move = result.move; // [id, character]
 
-            spaces[move[0]] = move[1];
-            games[gameID].spaces = spaces;
+            if (move) {
+                games[gameID].move = move;
+            }
             updateGameState()
         }
-
-
-
     })
 
-
-
-    // generate a new clientID
-    const clientID = createClientID();
-    clients[clientID] = {
-        'connection': connection
-    };
-
-    const payLoad = {
-        'method': 'connect',
-        'clientID': clientID
-    }
-
-        // send back the client connect
-    connection.send(JSON.stringify(payLoad))
 })
 
 // function for updating game state
@@ -157,7 +193,16 @@ function updateGameState() {
     game.clients.forEach(c => {
         clients[c.clientID].connection.send(JSON.stringify(payLoad));
     })
+
 }
+
+
+
+
+
+
+
+
 
 // function to create a clientID: random 8-character string of letters and numbers
 function createClientID() {

@@ -125,7 +125,3 @@ function toggleTheme() {
         }
     }
 }
-
-function header() {
-    window.location.href = "/local"
-}
