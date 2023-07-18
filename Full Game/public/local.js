@@ -9,19 +9,19 @@ grids.forEach(grid => grid.addEventListener('click', boxClicked));
 let restartBtn = document.getElementById('restart-btn')
 restartBtn.addEventListener('click',restart);
 
-let themeBtn = document.getElementById('theme-btn')
-themeBtn.addEventListener('click',toggleTheme);
-root = document.documentElement;
-const rootStyles = getComputedStyle(root);
-const background = rootStyles.getPropertyValue('--background');
-const primaryColor = rootStyles.getPropertyValue('--primary-color');
-const secondaryColor = rootStyles.getPropertyValue('--secondary-color');
-let winningColor = rootStyles.getPropertyValue('--winningSquares');
-const mainFont = rootStyles.getPropertyValue('--mainFont');
-let themes = [['main',background, primaryColor, secondaryColor, winningColor, mainFont],
-    ['dark', '#16171B', ' #8B5FBF', ' #BFA7DC ', ' #090A0B', ' "Times New Roman" '],
-    ['light', '#DEFFFC', ' #218380', ' #3B413C ', ' #85FFF5', ' "Times New Roman" ']
-    ]
+// let themeBtn = document.getElementById('theme-btn')
+// themeBtn.addEventListener('click',toggleTheme);
+// root = document.documentElement;
+// const rootStyles = getComputedStyle(root);
+// const background = rootStyles.getPropertyValue('--background');
+// const primaryColor = rootStyles.getPropertyValue('--primary-color');
+// const secondaryColor = rootStyles.getPropertyValue('--secondary-color');
+// let winningColor = rootStyles.getPropertyValue('--winningSquares');
+// const mainFont = rootStyles.getPropertyValue('--mainFont');
+// let themes = [['main',background, primaryColor, secondaryColor, winningColor, mainFont],
+//     ['dark', '#16171B', ' #8B5FBF', ' #BFA7DC ', ' #090A0B', ' "Times New Roman" '],
+//     ['light', '#DEFFFC', ' #218380', ' #3B413C ', ' #85FFF5', ' "Times New Roman" ']
+//     ]
 
 let spaces = Array(9).fill(null);
 let currentPlayer = 1;
